@@ -19,8 +19,31 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  final List<Icon> scoreKeeper = [
+    const Icon(Icons.check, color: Colors.green),
+    const Icon(Icons.check, color: Colors.green),
+    const Icon(Icons.close, color: Colors.red),
+    const Icon(Icons.check, color: Colors.green),
+  ];
+
+  void onAnswer() {
+    setState(() {
+      scoreKeeper.add(
+        const Icon(
+          Icons.check,
+          color: Colors.green,
+        ),
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,24 +52,43 @@ class MyHomePage extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Text(
-                    'This is where the question goes',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                    ),
-                  ),
-                ],
-              ),
+            const QuestionCard(title: 'This is where the question goes'),
+            AnswerButton(
+              title: 'True',
+              color: Colors.green,
+              onAnswer: onAnswer,
             ),
-            const AnswerButton(title: 'True', color: Colors.green),
-            const AnswerButton(title: 'False', color: Colors.red)
+            AnswerButton(
+              title: 'False',
+              color: Colors.red,
+              onAnswer: onAnswer,
+            ),
+            Row(children: scoreKeeper),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class QuestionCard extends StatelessWidget {
+  final String title;
+  const QuestionCard({Key? key, required this.title}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -55,7 +97,12 @@ class MyHomePage extends StatelessWidget {
 class AnswerButton extends StatelessWidget {
   final String title;
   final Color color;
-  const AnswerButton({Key? key, required this.color, required this.title})
+  final Function onAnswer;
+  const AnswerButton(
+      {Key? key,
+      required this.color,
+      required this.title,
+      required this.onAnswer})
       : super(key: key);
 
   @override
@@ -70,7 +117,9 @@ class AnswerButton extends StatelessWidget {
                 primary: color,
                 padding: const EdgeInsets.all(24.0),
               ),
-              onPressed: () {},
+              onPressed: () {
+                onAnswer();
+              },
               child: Text(title),
             ),
           ),
