@@ -25,8 +25,57 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[700],
-      body: Container(),
+      backgroundColor: Colors.grey[900],
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Text(
+                    'This is where the question goes',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const AnswerButton(title: 'True', color: Colors.green),
+            const AnswerButton(title: 'False', color: Colors.red)
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class AnswerButton extends StatelessWidget {
+  final String title;
+  final Color color;
+  const AnswerButton({Key? key, required this.color, required this.title})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                primary: color,
+                padding: const EdgeInsets.all(24.0),
+              ),
+              onPressed: () {},
+              child: Text(title),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
