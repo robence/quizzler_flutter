@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:quizzler_flutter/models/answer_button_type.dart';
-import 'package:quizzler_flutter/models/question.dart';
-import 'package:quizzler_flutter/models/quiz_answer.dart';
-import 'package:quizzler_flutter/data/questions.dart';
+import 'package:quizzler_flutter/question_controller.dart';
 import 'package:quizzler_flutter/ui/answer_button.dart';
-import 'package:quizzler_flutter/ui/answer_icon.dart';
 import 'package:quizzler_flutter/ui/question_card.dart';
 
 void main() {
@@ -35,27 +32,11 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  var questionNumber = 0;
+  QuestionController questionController = QuestionController();
 
-  Question getCurrentQuestion() => questions[questionNumber];
-
-  final List<AnswerIcon> scoreKeeper = [];
-
-  void onAnswer(AnswerButtonType buttonType) {
-    final currentQuestion = getCurrentQuestion();
-
-    final answer = buttonType.value == currentQuestion.correctAnswer
-        ? QuizAnswer.correct
-        : QuizAnswer.wrong;
-
+  void onAnswer(AnswerButtonType answerButton) {
     setState(() {
-      if (questionNumber < questions.length - 1) {
-        scoreKeeper.add(AnswerIcon(answer: answer));
-        questionNumber = questionNumber + 1;
-      } else {
-        scoreKeeper.clear();
-        questionNumber = 0;
-      }
+      questionController.answerQuiz(answerButton);
     });
   }
 
@@ -68,7 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: Column(
             children: [
-              QuestionCard(question: getCurrentQuestion()),
+              QuestionCard(question: questionController.getCurrentQuestion()),
               AnswerButton(
                 answer: AnswerButtonType.green,
                 onAnswer: onAnswer,
@@ -77,7 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 answer: AnswerButtonType.red,
                 onAnswer: onAnswer,
               ),
-              Row(children: scoreKeeper),
+              Row(children: questionController.answerList),
             ],
           ),
         ),
