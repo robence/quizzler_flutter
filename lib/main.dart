@@ -36,7 +36,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void onAnswer(AnswerButtonType answerButton) {
     setState(() {
-      questionController.answerQuiz(answerButton);
+      questionController.answerQuiz(answerButton, context);
     });
   }
 
