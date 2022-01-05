@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:quizzler_flutter/models/answer_button_type.dart';
+import 'package:quizzler_flutter/models/question.dart';
+import 'package:quizzler_flutter/models/quiz_answer.dart';
+import 'package:quizzler_flutter/data/questions.dart';
+import 'package:quizzler_flutter/ui/answer_button.dart';
+import 'package:quizzler_flutter/ui/answer_icon.dart';
+import 'package:quizzler_flutter/ui/question_card.dart';
 
 void main() {
   runApp(const MyApp());
@@ -10,6 +17,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -27,21 +35,27 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final List<Icon> scoreKeeper = [
-    const Icon(Icons.check, color: Colors.green),
-    const Icon(Icons.check, color: Colors.green),
-    const Icon(Icons.close, color: Colors.red),
-    const Icon(Icons.check, color: Colors.green),
-  ];
+  var questionNumber = 0;
 
-  void onAnswer() {
+  Question getCurrentQuestion() => questions[questionNumber];
+
+  final List<AnswerIcon> scoreKeeper = [];
+
+  void onAnswer(AnswerButtonType buttonType) {
+    final currentQuestion = getCurrentQuestion();
+
+    final answer = buttonType.value == currentQuestion.correctAnswer
+        ? QuizAnswer.correct
+        : QuizAnswer.wrong;
+
     setState(() {
-      scoreKeeper.add(
-        const Icon(
-          Icons.check,
-          color: Colors.green,
-        ),
-      );
+      if (questionNumber < questions.length - 1) {
+        scoreKeeper.add(AnswerIcon(answer: answer));
+        questionNumber = questionNumber + 1;
+      } else {
+        scoreKeeper.clear();
+        questionNumber = 0;
+      }
     });
   }
 
@@ -50,81 +64,24 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       backgroundColor: Colors.grey[900],
       body: SafeArea(
-        child: Column(
-          children: [
-            const QuestionCard(title: 'This is where the question goes'),
-            AnswerButton(
-              title: 'True',
-              color: Colors.green,
-              onAnswer: onAnswer,
-            ),
-            AnswerButton(
-              title: 'False',
-              color: Colors.red,
-              onAnswer: onAnswer,
-            ),
-            Row(children: scoreKeeper),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class QuestionCard extends StatelessWidget {
-  final String title;
-  const QuestionCard({Key? key, required this.title}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class AnswerButton extends StatelessWidget {
-  final String title;
-  final Color color;
-  final Function onAnswer;
-  const AnswerButton(
-      {Key? key,
-      required this.color,
-      required this.title,
-      required this.onAnswer})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                primary: color,
-                padding: const EdgeInsets.all(24.0),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Column(
+            children: [
+              QuestionCard(question: getCurrentQuestion()),
+              AnswerButton(
+                answer: AnswerButtonType.green,
+                onAnswer: onAnswer,
               ),
-              onPressed: () {
-                onAnswer();
-              },
-              child: Text(title),
-            ),
+              AnswerButton(
+                answer: AnswerButtonType.red,
+                onAnswer: onAnswer,
+              ),
+              Row(children: scoreKeeper),
+            ],
           ),
         ),
-      ],
+      ),
     );
   }
 }
